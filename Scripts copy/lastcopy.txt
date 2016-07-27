@@ -1,0 +1,632 @@
+using UnityEngine;
+using System.Collections;
+using System;
+using UnityEngine.UI;
+using System.Linq;
+using Mehroz;
+
+public class Gauss2 : MonoBehaviour
+{
+    public InputField inp1;
+    public InputField inp2;
+    public InputField inp3;
+  
+    public GameObject g1;
+    public GameObject g2;
+    public GameObject g3;
+
+
+   public GameObject output;
+    static bool swapp = false;
+    public static string textt = "";
+    static public bool n = false;
+     string fromn = "";
+    // Use this for initialization
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+       
+    }
+    public void Click()
+    {
+        GameObject t = GameObject.Find("Text");
+        t.GetComponent<Text>().text = "";
+        t = null;
+        GC.Collect();
+        int size = 3;
+
+        //if (inp3.text == "" && g3.active)
+        //{
+        //    g3.SetActive(false);
+        //    size--;
+        //}
+        //else
+        //    g3.SetActive(true);
+        //if (inp2.text == "" && g2.active)
+        //{
+        //    size--;
+        //    g2.SetActive(false);
+        //}
+        //else
+        //    g2.SetActive(true);
+        //if (inp1.text == "" && g1.active)
+        //{
+        //    size--;
+        //    g1.SetActive(false);
+        //}
+        //else
+        //    g1.SetActive(true);
+
+
+
+
+
+
+
+        ///\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\//////////////////////////////
+        ///
+        string[] srows = new string[size];
+        int sirows = 0;
+        double[,] irows=null;
+        if (g1.active)
+        {
+            srows = new string[size];
+            srows[0] = inp1.text;
+            srows[1] = inp2.text;
+            srows[2] = inp3.text;
+            sirows = 0;
+
+
+
+            //srows[3] = inp4.text;
+            // srows[4] = inp5.text;
+            // srows[5] = inp6.text;
+
+
+            string[] ss = new string[size];
+            for (int i = 0; i < srows.Length; i++)
+            {
+
+                ss[i] += srows[i];
+
+            }
+            int tt = 0;
+            for (int i = 0; i < size; i++)
+                if (srows[i] == "")
+                {
+                    tt--;
+
+                    srows[i] = null;
+                }
+            srows = new string[size - tt];
+            for (int i = 0; i < srows.Length; i++)
+                srows[i] = ss[i];
+            string[] g = srows[0].Split(',');
+            for (int i = 0; i < g.Length; i++)
+                sirows++;
+            irows = new double[size, sirows];
+            for (int i = 0; i < size; i++)
+                for (int j = 0; j < sirows; j++)
+                {
+                    string[] s = new string[srows.Length];
+                    s = srows[i].Split(',');
+                    irows[i, j] = Convert.ToDouble(s[j]);
+                }
+
+        }
+        else
+        {
+           
+            fromn = inp3.text;
+            string[] ss = fromn.Split('!');
+            size = ss.Length;
+            srows = new string[size];
+            for (int i = 0; i < size; i++)
+                srows[i] = ss[i];
+            string[] g = ss[0].Split(',');
+            for (int i = 0; i < g.Length; i++)
+                sirows++;
+            irows = new double[size, sirows];
+            for (int i = 0; i < size; i++)
+                for (int j = 0; j < sirows; j++)
+                {
+                    string[] s = new string[srows.Length];
+                    s = srows[i].Split(',');
+                    irows[i, j] = Convert.ToDouble(s[j]);
+                }
+        }
+        ///\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\//////////////////////////////
+        /// int pivot = 0;
+        //for (int i = 0; i < srows.Length; i++)
+        //{
+        //    if (irows[0, 0] == 1)
+        //        break;
+        //    if (irows[i, 0] == 1 && i != 0)
+        //    {
+        //        for (int j = 0; j < sirows; j++)
+        //        {
+        //            int[] temp = new int[sirows];
+        //            temp[j] = irows[0, j];
+        //            irows[0, j] = irows[i, j];
+        //            irows[i, j] = temp[j];
+        //        }
+        //    }
+        //}
+        ///\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\//////////////////////////////
+        ///
+
+        double mnozz = 0;
+        bool isdouble = false;
+        double mnoz = 0;
+        bool flag = false;
+        int counterformnoz = 0;
+        int fortarg = 0;
+       irows= CheckForDuplicate(irows, sirows, srows.Length);
+        for (int k = 0; k < srows.Length; k++)
+        {
+            irows = Divide(irows, sirows, srows.Length);
+            irows = Dividethree(irows, sirows, srows.Length);
+            if (!CheckForError(irows, sirows, srows.Length))
+            {
+                output.GetComponent<Text>().text = "This system has no solutions!";
+                return;
+                
+            }
+            double pivot = GetPivot(k, irows);
+            if (pivot == 0)
+            {
+                if (k == srows.Length - 1)
+                    break;
+                irows = Swap(irows, sirows, k);
+                pivot = GetPivot(k, irows);
+            }
+            double current = 0;
+            counterformnoz = k+1;
+            fortarg = k + 1;
+            double dcurrent = 0;
+            for (int i = counterformnoz; i < srows.Length; i++)
+            {
+                //double targ = GetTarget(irows, fortarg, k);
+                //if (targ == 0)
+                //{
+                //    fortarg++;
+                //    counterformnoz++;
+                //    continue;
+
+                //}
+                for (int j = 0; j < sirows; j++)
+                {
+               
+                    if (!flag)
+                    {
+                  
+                        double temp = GetTarget(irows, counterformnoz, k);
+                        mnoz = Moznik(pivot, GetTarget(irows, counterformnoz, k));
+
+                        mnozz = temp;
+                        mnozz /= pivot;
+                        counterformnoz++;
+
+
+                        flag = true;
+                    }
+                  
+                        dcurrent = GetCurrent(irows, k, j) * mnozz;
+                        irows[i, j] -= dcurrent;
+                       
+                    
+                  
+                }
+                flag = false;
+                //CheckForRows(irows, sirows, i);
+             
+            
+            }
+          
+        }
+        ///\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\//////////////////////////////
+        ///
+        irows = Divide(irows, sirows, srows.Length);
+        GC.Collect();
+
+        ///\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\//////////////////////////////
+        ///
+        mnozz = 0;
+         isdouble = false;
+        irows = LastStep(irows, sirows, srows.Length);
+        //if (!CheckForEnd(irows, sirows, srows.Length))
+        for (int k = srows.Length-1; k > 0; k--)
+        {
+           // irows=CheckForRows(irows, sirows, k);
+            if (swapp)
+            {
+                swapp = false;
+                irows = Divide(irows, sirows, srows.Length);
+               
+                continue;
+            }
+           
+
+            double pivot = GetPivot(k, irows);
+            if (pivot == 0)
+            {
+                continue;
+            }
+            
+            double current = 0;
+            counterformnoz = k - 1;
+            double dcurrent = 0;
+            for (int i = counterformnoz; i >=0; i--)
+            {
+                for (int j = 0; j < sirows; j++)
+                {
+                    if (!flag)
+                    {
+                        double temp = GetTarget(irows, counterformnoz, k);
+                        mnoz = Moznik(pivot, GetTarget(irows, counterformnoz, k));
+                       
+                            mnozz = temp;
+                            mnozz /= pivot;
+                         
+                        counterformnoz--;
+
+                        flag = true;
+                        
+                    }
+                   
+                        dcurrent = GetCurrent(irows, k, j) * mnozz;
+                        irows[i, j] -= dcurrent;
+                 
+                }
+                flag = false;
+                isdouble = false;
+
+
+            }
+           
+
+        }
+
+        GC.Collect();
+
+        irows = LastStep(irows, sirows, srows.Length);
+    
+        
+        string ass = new Fraction(5).ToString();
+        
+        
+        for (int i = 0; i <srows.Length ; i++) {
+            for (int j = 0; j < sirows ; j++)
+            {
+                if(irows[i,j].ToString().Length>8)
+                output.GetComponent<Text>().text += new Fraction(irows[i, j].ToString().Substring(0,3)).ToString() + " ";
+                else
+                    output.GetComponent<Text>().text += new Fraction(irows[i, j].ToString()).ToString() + " ";
+                if (j == sirows-2)
+                    output.GetComponent<Text>().text += " |";
+                ass += irows[i, j].ToString() + " ";
+            }
+            ass += '\n';
+            output.GetComponent<Text>().text += '\n';
+                }
+        if(CheckForError(irows,sirows,srows.Length))
+        Debug.Log("Congratulations! Succseed");
+        else
+            Debug.Log("Congratulations! Bad matrix! Cann't solve!");
+        if (!CheckForError(irows, sirows, srows.Length))
+            output.GetComponent<Text>().text = "This system has no solutions!";
+    }
+
+
+
+    double[,] CheckForDuplicate(double[,] arr, int siros, int srows)
+    {
+        string f1="", f2="";
+        for (int k = 0; k < siros; k++)
+            for (int i = 0; i < siros; i++)
+            {
+                for (int j = 0; j < srows; j++)
+                {
+                    f1 += arr[i, j];
+                    f2 += arr[i + 1, j];
+            }
+          }
+        return arr;
+    }
+
+    double[,] CheckForBackSwap(double[,] arr, int sirows, int srows)
+    {
+        bool t = false;
+        srows--;
+        for (int i = 0; i < sirows; i++)
+        {
+            if (arr[0, i] == 0)
+                t = true;
+            else {
+                t = false;
+                break;
+            }
+        }
+        if(t)
+      arr=  Swap(arr, sirows, 0);
+        return arr;
+    }
+    bool CheckForEnd(double[,] arr, int sirows, int srows)
+    {
+        bool t = false;
+        srows--;
+        for (int i = 0; i < sirows; i++)
+        {
+            if (arr[srows, i] == 0)
+                t = true;
+            else {
+                t = false;
+                break;
+            }
+        }
+        if (arr[srows - 1, 0] == 0)
+            t = true;
+        else
+            t = false;
+        return t;
+    }
+    double[,] LastStep(double[,] arr, int sirows, int srows)
+    {
+
+       
+        arr = Divide(arr, sirows, srows);
+        arr = Dividethree(arr, sirows, srows);
+        for (int k = srows - 1; k >= 0; k--)
+        {
+
+            double pivot = GetPivot(k, arr);
+            if (pivot == 0)
+                continue;
+            if (pivot < 0)
+                for (int j = 0; j < sirows; j++)
+                    arr[k, j] *= -1;
+
+        }
+        return arr;
+     }
+    bool CheckForError(double[,] arr, int siros, int srows)
+    {
+        bool[] bb = new bool[siros];
+        bool res = false;
+        int counter=0;
+        for (int i = 0; i < bb.Length; i++)
+            bb[i] = false;
+        counter = 0;
+        for (int i = 0; i < srows; i++)
+        {
+            bool flag = true;
+            for (int j = 0; j < siros; j++)
+            {
+                if (arr[i, j] != 0)
+                {
+                
+                    bb[j] = true;
+                    counter++;
+                }
+            }
+            for (int j = 0; j < siros; j++)
+            {
+                if (counter == 1)
+                    return false;
+                else
+                    counter = 0;
+                if (!bb[j])
+                    res = false;
+                else {
+                    res = true;
+                    break;
+                }
+            }
+            if (!res)
+                return true;
+           
+            if (!flag)
+                return false;
+        }
+
+        return true;
+
+    }
+    double[,] Dividethree(double[,] arr, int sirows, int srows)
+    {
+        int countzero = 0;
+        int[] tt = new int[sirows];
+        int gccd = 0;
+        bool[] bb = new bool[sirows];
+        for (int i = 0; i < bb.Length; i++)
+            bb[i] = false;
+        bool check = false;
+
+        for (int i = 0; i < srows; i++)
+        {
+
+            for (int j = 0; j < sirows; j++)
+            {
+                if (arr[i, j] % 3 == 0 || arr[i, j] == 0)
+                    bb[j] = true;
+                if (arr[i, j] == 0)
+                    countzero++;
+            }
+            //for (int b = 0; b < sirows; b++)
+            //    if (irows[i, b] == 0)
+            //        count++;
+            //if (count != bb.Length)
+            //    continue;
+            for (int l = 0; l < bb.Length; l++)
+            {
+                if (bb[l] && countzero < sirows - 1)
+                    check = true;
+                else {
+                    check = false;
+                    break;
+                }
+            }
+            if (check)
+            {
+                for (int t = 0; t < sirows; t++)
+                {
+                    tt[t] = Convert.ToInt32(arr[i, t]);
+                }
+                gccd = GreatestCommonDivisor(tt);
+                for (int e = 0; e < sirows; e++)
+                    arr[i, e] /= gccd;
+            }
+            for (int uii = 0; uii < bb.Length; uii++)
+            {
+                bb[uii] = false;
+                countzero = 0;
+            }
+        }
+        return arr;
+
+    }
+    double[,] Divide(double[,] arr, int sirows,int srows)
+    {
+        int countzero = 0;
+        int[] tt = new int[sirows];
+        int gccd = 0;
+        bool[] bb = new bool[sirows];
+        for (int i = 0; i < bb.Length; i++)
+            bb[i] = false;
+        bool check = false;
+
+        for (int i = 0; i < srows; i++)
+        {
+            
+            for (int j = 0; j < sirows; j++)
+            {
+                if (arr[i, j] % 2 == 0 || arr[i, j] == 0)
+                    bb[j] = true;
+                if(arr[i,j]==0)
+                    countzero++;
+            }
+            //for (int b = 0; b < sirows; b++)
+            //    if (irows[i, b] == 0)
+            //        count++;
+            //if (count != bb.Length)
+            //    continue;
+            for (int l = 0; l < bb.Length; l++)
+            {
+                if (bb[l]&&countzero<sirows-1)
+                    check = true;
+                else {
+                    check = false;
+                    break;
+                }
+            }
+            if (check)
+            {
+                for (int t = 0; t < sirows; t++)
+                {
+                    tt[t] =Convert.ToInt32(arr[i, t]);
+                }
+                gccd = GreatestCommonDivisor(tt);
+                for (int e = 0; e < sirows; e++)
+                    arr[i, e] /= gccd;
+            }
+            for (int uii = 0; uii < bb.Length; uii++)
+            {
+                bb[uii] = false;
+                countzero = 0;
+            }
+        }
+        return arr;
+
+    }
+    double[,] Swap(double[,] arr, int sirows, int i)
+    {
+        double[] temp = new double[sirows];
+            for (int f = 0; f < sirows; f++)
+                temp[f] = arr[i, f];
+        
+            for (int j = 0; j < sirows; j++)
+            {
+                arr[i, j] = arr[i + 1, j];
+                arr[i + 1, j] = temp[j];
+            }
+        return arr;
+     }
+    double[,] SwapForBackwards(double[,] arr, int sirows, int i)
+    {
+        double[] temp = new double[sirows];
+        for (int f = 0; f < sirows; f++)
+            temp[f] = arr[i, f];
+
+        for (int j = 0; j < sirows; j++)
+        {
+            arr[i, j] = arr[i - 1, j];
+            arr[i - 1, j] = temp[j];
+        }
+        swapp = true;
+        return arr;
+    }
+    double[,] CheckForRows(double[,]arr,int sirows,int i)
+    {
+        bool check = false;
+        double[] a = new double[sirows];
+        for (int ii = 0; ii < sirows; ii++)
+            a[ii] = arr[i-1, ii];
+        for (int k = 0; k < sirows; k++)
+            if (a[k] != 0)
+                check = true;
+        if(check)
+        return arr;
+        return SwapForBackwards(arr, sirows, i);
+    }
+    double GetTarget(double[,]arr,int pivot, int WhicRow)
+    {
+        return arr[pivot, WhicRow];
+    }
+    int Moznik(int pivot, int target)
+    {
+        return target / pivot;
+    }
+    double Moznik(double pivot, double target)
+    {
+        return target / pivot;
+    }
+    double GetCurrent(double[,]arr, int WhichRow, int WhichPos)
+    {
+        return arr[WhichRow,WhichPos];
+    }
+    double GetPivot(int WhichRow, double[,]arr)
+    {
+        double res =0;
+        try
+        {
+            if (arr[WhichRow, WhichRow] != 0)
+                return arr[WhichRow, WhichRow];
+        }
+        catch
+        {
+            if (arr[WhichRow-1, WhichRow-1] != 0)
+                return arr[WhichRow-1, WhichRow-1];
+        }
+        int i = 0;
+        while (res != 0)
+        {
+            res = arr[WhichRow, i];
+            i++;
+        }
+        return res;
+    }
+    static int GreatestCommonDivisor(int[] numbers)
+    {
+        return numbers.Aggregate(GreatestCommonDivisor);
+    }
+
+    static int GreatestCommonDivisor(int x, int y)
+    {
+        return y == 0 ? x : GreatestCommonDivisor(y, x % y);
+    }
+}
